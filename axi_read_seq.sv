@@ -2,15 +2,11 @@
 //
 class axi_read_seq#(int data_width = 16, int addr_width = 16) extends uvm_sequence;
     `uvm_object_param_utils(axi_read_seq#(data_width, addr_width));
+    
+    //  Group: Variables
     const int no_of_trans;
     bit[7:0] id;
-    //  Group: Variables
     axi_transaction#(data_width, addr_width) trans;
-
-    //  Group: Constraints
-
-
-    //  Group: Functions
 
     //  Constructor: new
     function new(string name = "axi_read_seq");
