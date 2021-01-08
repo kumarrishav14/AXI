@@ -82,6 +82,7 @@ function void axi_transaction::do_print(uvm_printer printer);
     super.do_print(printer);
 
     /*  list of local properties to be printed:  */
+    printer.print_field("ID", id, $bits(id), UVM_UNSIGNED);
     printer.print_field("Addr", addr, $bits(addr), UVM_HEX);
     printer.print_generic("Data", "dynamic array", 8*2**b_size*(b_len+1), $sformatf("%u", data));
     printer.print_field("Burst Size", b_size, $bits(b_size), UVM_UNSIGNED);
