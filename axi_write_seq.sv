@@ -3,6 +3,7 @@
 class axi_write_seq#(int data_width = 16, int addr_width = 16) extends uvm_sequence;
     `uvm_object_param_utils(axi_write_seq#(data_width, addr_width));
     const int no_of_trans;
+    bit[7:0] id;
     //  Group: Variables
     axi_transaction#(data_width, addr_width) trans;
 
@@ -68,8 +69,10 @@ endclass: axi_write_seq
 
 task axi_write_seq::body();
     repeat(no_of_trans) begin
+        id++;
         trans = new("trans");
         trans.randomize();
+        trans.id = {0, id};
         trans.print();
         #10;
     end
