@@ -2,9 +2,12 @@ class axi_master extends uvm_agent;
     `uvm_component_utils(axi_master)
     
     // Components
-    uvm_sequencer#(axi_transaction) w_seqr;
-    uvm_sequencer#(axi_transaction) r_seqr;
+    uvm_sequencer#(axi_transaction#(D_WIDTH, A_WIDTH)) w_seqr;
+    uvm_sequencer#(axi_transaction#(D_WIDTH, A_WIDTH)) r_seqr;
     axi_m_driver drv;
+
+    // Variables
+    env_config env_cfg;
 
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -19,13 +22,16 @@ class axi_master extends uvm_agent;
 endclass //axi_master extends uvm_agent
 
 function void axi_master::build_phase(uvm_phase phase);
-    /*  note: Do not call super.build_phase() from any class that is extended from an UVM base class!  */
-    /*  For more information see UVM Cookbook v1800.2 p.503  */
-    //super.build_phase(phase);
-
+    env_cfg = new("env_cfg");
+    assert (uvm_config_db#(env_config)::get(this, "", "config", env_cfg)) begin
+        `uvm_info(get_name(), "vif has been found in ConfigDB.", UVM_LOW)
+    end else `uvm_fatal(get_name(), "vif cannot be found in ConfigDB!")
+    
     drv = axi_m_driver::type_id::create("drv", this);
-    w_seqr = uvm_sequencer#(axi_transaction)::type_id::create("w_seqr", this);
-    r_seqr = uvm_sequencer#(axi_transaction)::type_id::create("r_seqr", this);
+    w_seqr = uvm_sequencer#(axi_transaction#(D_WIDTH, A_WIDTH))::type_id::create("w_seqr", this);
+    r_seqr = uvm_sequencer#(axi_transaction#(D_WIDTH, A_WIDTH))::type_id::create("r_seqr", this);
+    
+    drv.vif = env_cfg.intf;
 endfunction: build_phase
 
 function void axi_master::connect_phase(uvm_phase phase);
