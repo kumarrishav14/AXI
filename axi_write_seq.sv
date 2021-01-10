@@ -1,12 +1,12 @@
 //  Class: axi_write_seq
 //
 class axi_write_seq#(D_WIDTH = 16, int A_WIDTH = 16) extends uvm_sequence;
-    `uvm_object_param_utils(axi_write_seq#(data_width, addr_width));
+    `uvm_object_param_utils(axi_write_seq#(D_WIDTH, A_WIDTH));
     
     //  Group: Variables
     const int no_of_trans;
     bit[7:0] id;
-    axi_transaction#(data_width, addr_width) trans;
+    axi_transaction#(D_WIDTH, A_WIDTH) trans;
 
     //  Constructor: new
     function new(string name = "axi_write_seq");
