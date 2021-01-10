@@ -23,9 +23,11 @@ endclass: axi_read_seq
 task axi_read_seq::body();
     repeat(no_of_trans) begin
         id++;
-        trans = new("trans");
+        trans = axi_transaction#(D_WIDTH, A_WIDTH)::type_id::create("trans");
+        start_item(trans);
         trans.randomize();
         trans.id = {1, id};
+        finish_item(trans);
         trans.print();
         #10;
     end
