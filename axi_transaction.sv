@@ -2,7 +2,7 @@ import uvm_pkg::*;
 
 //  Class: axi_transaction
 //
-class axi_transaction#(int d_width = 16, int a_width = 16) extends uvm_sequence_item;
+class axi_transaction#(d_width = 16, a_width = 16) extends uvm_sequence_item;
     typedef axi_transaction#(d_width, a_width) this_type_t;
     `uvm_object_param_utils(axi_transaction#(d_width, a_width));
     typedef enum bit[1:0] { FIXED, INCR, WARP } B_TYPE;

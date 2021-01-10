@@ -1,6 +1,6 @@
 //  Class: axi_write_seq
 //
-class axi_write_seq#(int data_width = 16, int addr_width = 16) extends uvm_sequence;
+class axi_write_seq#(D_WIDTH = 16, int A_WIDTH = 16) extends uvm_sequence;
     `uvm_object_param_utils(axi_write_seq#(data_width, addr_width));
     
     //  Group: Variables
