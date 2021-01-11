@@ -35,7 +35,7 @@ endclass //m_driver extends uvn_driver#(axu)
 
 task axi_m_driver::run_phase(uvm_phase phase);
     `uvm_info("DEBUG", "started master driver", UVM_HIGH)
-    
+    // temp 
     forever begin
         drive();
         #1;
@@ -72,7 +72,6 @@ task axi_m_driver::drive();
                 send_read_address();
                 seq_item_port2.item_done();
                 r_done = 1;
-                
             end
         end
     join_none
@@ -128,7 +127,6 @@ task axi_m_driver::send_write_data();
         vif.m_drv_cb.WVALID <= 1;
 
         // Wait for WREADY and deassert AWVALID
-        // @(vif.m_drv_cb);
         #1;
         wait(vif.m_drv_cb.WREADY);
         vif.m_drv_cb.WVALID <= 0;
@@ -138,15 +136,25 @@ endtask: send_write_data
 
 
 task axi_m_driver::send_read_address();
+    // Send the read address and control signals
+    @(vif.m_drv_cb);
     vif.m_drv_cb.ARID   <= r_trans.id;
     vif.m_drv_cb.ARADDR <= r_trans.addr;
     vif.m_drv_cb.ARLEN  <= r_trans.b_len;
     vif.m_drv_cb.ARSIZE <= r_trans.b_size;
     vif.m_drv_cb.ARBURST<= r_trans.b_type;
+
+    // Assert ARVALID after one clock cycle
     @(vif.m_drv_cb);
     vif.m_drv_cb.ARVALID<= 1;
-    repeat(2)@(vif.m_drv_cb);
+
+    // Wait for AWREADY and deassert AWVALID
+    @(vif.m_drv_cb);
+    wait(vif.m_drv_cb.ARREADY);
     vif.m_drv_cb.ARVALID<= 0;
+
+    // Wait for RLAST signal before sending next address
+    wait(vif.m_drv_cb.RLAST && vif.m_drv_cb.RVALID);
 endtask: send_read_address
 
 
