@@ -1,11 +1,11 @@
 import uvm_pkg::*;
-
+typedef enum bit[1:0] { FIXED, INCR, WARP } B_TYPE;
 //  Class: axi_transaction
 //
 class axi_transaction#(d_width = 16, a_width = 16) extends uvm_sequence_item;
     typedef axi_transaction#(d_width, a_width) this_type_t;
     `uvm_object_param_utils(axi_transaction#(d_width, a_width));
-    typedef enum bit[1:0] { FIXED, INCR, WARP } B_TYPE;
+    
 
     //  Group: Variables
     bit [8:0] id;
@@ -14,8 +14,10 @@ class axi_transaction#(d_width = 16, a_width = 16) extends uvm_sequence_item;
     rand bit [2:0] b_size;
     rand bit [3:0] b_len;
     rand B_TYPE b_type;
+    bit b_last;
     bit [1:0] b_resp;
     bit [1:0] r_resp [];
+    
 
     //  Group: Constraints
     constraint b_size_val { 8*(2**b_size) <= d_width; }
