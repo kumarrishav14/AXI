@@ -5,6 +5,7 @@ class axi_master extends uvm_agent;
     uvm_sequencer#(axi_transaction#(D_WIDTH, A_WIDTH)) w_seqr;
     uvm_sequencer#(axi_transaction#(D_WIDTH, A_WIDTH)) r_seqr;
     axi_m_driver drv;
+    axi_m_monitor mon;
 
     // Variables
     env_config env_cfg;
@@ -28,10 +29,12 @@ function void axi_master::build_phase(uvm_phase phase);
     end else `uvm_fatal(get_name(), "vif cannot be found in ConfigDB!")
     
     drv = axi_m_driver::type_id::create("drv", this);
+    mon = axi_m_monitor::type_id::create("mon", this);
     w_seqr = uvm_sequencer#(axi_transaction#(D_WIDTH, A_WIDTH))::type_id::create("w_seqr", this);
     r_seqr = uvm_sequencer#(axi_transaction#(D_WIDTH, A_WIDTH))::type_id::create("r_seqr", this);
     
     drv.vif = env_cfg.intf;
+    mon.vif = env_cfg.intf;
 endfunction: build_phase
 
 function void axi_master::connect_phase(uvm_phase phase);

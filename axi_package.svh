@@ -5,4 +5,5 @@ import uvm_pkg::*;
 `include "axi_read_seq.sv"
 `include "axi_config_objs.svh"
 `include "axi_m_driver.sv"
+`include "axi_m_monitor.sv"
 `include "axi_master.sv"
