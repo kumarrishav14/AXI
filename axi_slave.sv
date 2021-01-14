@@ -3,7 +3,7 @@ class axi_slave extends uvm_agent;
     
     // Components
     axi_s_driver drv;
-    // axi_m_monitor mon;
+    axi_s_monitor mon;
 
     // Variables
     env_config env_cfg;
@@ -27,10 +27,10 @@ function void axi_slave::build_phase(uvm_phase phase);
     end else `uvm_fatal(get_name(), "vif cannot be found in ConfigDB!")
     
     drv = axi_s_driver::type_id::create("drv", this);
-    // mon = axi_m_monitor::type_id::create("mon", this);
+    mon = axi_s_monitor::type_id::create("mon", this);
     
     drv.vif = env_cfg.intf;
-    // mon.vif = env_cfg.intf;
+    mon.vif = env_cfg.intf;
 endfunction: build_phase
 
 function void axi_slave::connect_phase(uvm_phase phase);
