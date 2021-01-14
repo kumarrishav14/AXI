@@ -1,5 +1,5 @@
-class axi_m_monitor extends uvm_monitor;
-    `uvm_component_utils(axi_m_monitor)
+class axi_s_monitor extends uvm_monitor;
+    `uvm_component_utils(axi_s_monitor)
 
     // Components
     uvm_analysis_port#(axi_transaction#(D_WIDTH, A_WIDTH)) ap;
@@ -26,20 +26,20 @@ class axi_m_monitor extends uvm_monitor;
     //  Function: run_phase
     extern task run_phase(uvm_phase phase);
     
-endclass //axi_m_monitor extends uvm_monitor
+endclass //axi_s_monitor extends uvm_monitor
 
-function void axi_m_monitor::build_phase(uvm_phase phase);
+function void axi_s_monitor::build_phase(uvm_phase phase);
     ap = new("ap", this);
 endfunction: build_phase
 
-task axi_m_monitor::run_phase(uvm_phase phase);
+task axi_s_monitor::run_phase(uvm_phase phase);
     forever begin
         run_mon(phase);
         @(vif.mon_cb);
     end
 endtask: run_phase
 
-task axi_m_monitor::run_mon(uvm_phase phase);
+task axi_s_monitor::run_mon(uvm_phase phase);
     fork
         if(w_done) begin
             phase.raise_objection(this);
@@ -59,7 +59,7 @@ task axi_m_monitor::run_mon(uvm_phase phase);
     join_none
 endtask: run_mon
 
-task axi_m_monitor::write_monitor();
+task axi_s_monitor::write_monitor();
     if(vif.mon_cb.AWVALID && vif.mon_cb.AWREADY) begin
         w_trans         = axi_transaction#(D_WIDTH, A_WIDTH)::type_id::create("w_trans");
         w_trans.addr    = vif.mon_cb.AWADDR;
@@ -79,11 +79,11 @@ task axi_m_monitor::write_monitor();
         wait(vif.mon_cb.BVALID);
         w_trans.b_resp = vif.mon_cb.BRESP;
         ap.write(w_trans);
-        `uvm_info("MMON", $sformatf("WTRANS %s", w_trans.convert2string()), UVM_HIGH)
+        `uvm_info("SMON", $sformatf("WTRANS %s", w_trans.convert2string()), UVM_HIGH)
     end
 endtask: write_monitor
 
-task axi_m_monitor::read_monitor();
+task axi_s_monitor::read_monitor();
     if(vif.mon_cb.ARVALID && vif.mon_cb.ARREADY) begin
         r_trans         = axi_transaction#(D_WIDTH, A_WIDTH)::type_id::create("r_trans");
         r_trans.addr    = vif.mon_cb.ARADDR;
@@ -103,6 +103,6 @@ task axi_m_monitor::read_monitor();
             r_trans.r_resp[i] = vif.mon_cb.RRESP;
         end
         ap.write(r_trans);
-        `uvm_info("MMON", $sformatf("RTRANS %s", r_trans.convert2string()), UVM_HIGH)
+        `uvm_info("SMON", $sformatf("RTRANS %s", r_trans.convert2string()), UVM_HIGH)
     end
 endtask: read_monitor

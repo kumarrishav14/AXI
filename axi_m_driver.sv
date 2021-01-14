@@ -36,6 +36,8 @@ endclass //m_driver extends uvn_driver#(axu)
 task axi_m_driver::run_phase(uvm_phase phase);
     `uvm_info("DEBUG", "started master driver", UVM_HIGH)
     // temp 
+    vif.m_drv_cb.BREADY <= 1;
+    vif.m_drv_cb.RREADY <= 1;
     forever begin
         drive();
         #1;
@@ -51,7 +53,7 @@ task axi_m_driver::drive();
     end
     fork
         begin
-            `uvm_info("DEBUG", $sformatf("w_addr(), w_done = %0d", w_done), UVM_HIGH)
+            `uvm_info("DEBUG", $sformatf("w_addr(), w_done = %0d", w_done), UVM_DEBUG)
             if(w_done) begin
                 w_done = 0;
                 seq_item_port.get_next_item(w_trans);
@@ -65,7 +67,7 @@ task axi_m_driver::drive();
             end
         end
         begin
-            `uvm_info("DEBUG", $sformatf("r_addr(), r_done = %0d", r_done), UVM_HIGH)
+            `uvm_info("DEBUG", $sformatf("r_addr(), r_done = %0d", r_done), UVM_DEBUG)
             if(r_done) begin
                 r_done = 0;
                 seq_item_port2.get_next_item(r_trans);
@@ -126,12 +128,13 @@ task axi_m_driver::send_write_data();
         @(vif.m_drv_cb);
         vif.m_drv_cb.WVALID <= 1;
 
-        // Wait for WREADY and deassert AWVALID
+        // Wait for WREADY and deassert WVALID
         #1;
         wait(vif.m_drv_cb.WREADY);
         vif.m_drv_cb.WVALID <= 0;
         vif.m_drv_cb.WLAST  <= 0;
     end
+    wait(vif.m_drv_cb.BVALID);
 endtask: send_write_data
 
 

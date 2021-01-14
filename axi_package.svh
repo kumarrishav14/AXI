@@ -7,3 +7,6 @@ import uvm_pkg::*;
 `include "axi_m_driver.sv"
 `include "axi_m_monitor.sv"
 `include "axi_master.sv"
+`include "axi_s_driver.sv"
+`include "axi_s_monitor.sv"
+`include "axi_slave.sv"

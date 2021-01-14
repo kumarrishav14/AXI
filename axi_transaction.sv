@@ -1,5 +1,5 @@
 import uvm_pkg::*;
-typedef enum bit[1:0] { FIXED, INCR, WARP } B_TYPE;
+typedef enum bit[1:0] { FIXED, INCR, WRAP } B_TYPE;
 //  Class: axi_transaction
 //
 class axi_transaction#(d_width = 16, a_width = 16) extends uvm_sequence_item;
@@ -33,6 +33,14 @@ class axi_transaction#(d_width = 16, a_width = 16) extends uvm_sequence_item;
             data[i].size() == 2**b_size;
     }
 
+    // constraint b_type_val {
+    //     /*  solve order constraints  */
+    
+    //     /*  rand variable constraints  */
+    //     b_type == WRAP;
+    // }
+    
+
     constraint b_len_val {
         /*  solve order constraints  */
         solve b_type before b_len;
@@ -40,8 +48,18 @@ class axi_transaction#(d_width = 16, a_width = 16) extends uvm_sequence_item;
         /*  rand variable constraints  */
         if(b_type == FIXED)
             b_len inside { 0, 1 };
-        else if(b_type == WARP)
+        else if(b_type == WRAP)
             b_len inside { 1, 3, 7, 15 };
+    }
+    
+    constraint addr_val {
+        /*  solve order constraints  */
+        solve b_type before addr;
+        solve b_size before addr;
+
+        /*  rand variable constraints  */
+        if(b_type == WRAP)
+            addr == int'(addr/2**b_size) * 2**b_size;
     }
     
     //  Group: Functions
