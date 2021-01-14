@@ -36,6 +36,8 @@ endclass //m_driver extends uvn_driver#(axu)
 task axi_m_driver::run_phase(uvm_phase phase);
     `uvm_info("DEBUG", "started master driver", UVM_HIGH)
     // temp 
+    vif.m_drv_cb.BREADY <= 1;
+    vif.m_drv_cb.RREADY <= 1;
     forever begin
         drive();
         #1;

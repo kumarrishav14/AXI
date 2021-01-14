@@ -195,6 +195,7 @@ task axi_s_driver::read_write_data();
     @(vif.s_drv_cb);
     vif.s_drv_cb.BVALID <= 1;
     @(vif.s_drv_cb);
+    wait(vif.s_drv_cb.BREADY)
     vif.s_drv_cb.BVALID <= 0;
 endtask: read_write_data
 
@@ -277,10 +278,15 @@ task axi_s_driver::send_read_data();
         // Follows little endian
         err = 0;
         for (int j=lower_byte_lane; j<=upper_byte_lane; j++) begin
-            if(!mem.exists(addr_n+j-lower_byte_lane))
+            if(!mem.exists(addr_n+j-lower_byte_lane)) begin
                 err = 1;
-            vif.s_drv_cb.RDATA[8*c+:8] <= mem[addr_n+j-lower_byte_lane];
-            `uvm_info("DEBUG_S", $sformatf("c is %0d, addr is %0d, stored value is %h", c, addr_n+j-lower_byte_lane, mem[addr_n+j-lower_byte_lane]), UVM_HIGH)
+                vif.s_drv_cb.RDATA[8*c+:8] <= 'b0;
+                `uvm_info("DEBUG_S", $sformatf("c is %0d, addr is %0d, No data in location", c, addr_n+j-lower_byte_lane), UVM_HIGH)
+            end
+            else begin
+                vif.s_drv_cb.RDATA[8*c+:8] <= mem[addr_n+j-lower_byte_lane];
+                `uvm_info("DEBUG_S", $sformatf("c is %0d, addr is %0d, stored value is %h", c, addr_n+j-lower_byte_lane, mem[addr_n+j-lower_byte_lane]), UVM_HIGH)
+            end
             c++;
             c = c>=no_bytes ? 0:c;
         end
@@ -314,6 +320,7 @@ task axi_s_driver::send_read_data();
             end
         end
         @(vif.s_drv_cb);
+        wait(vif.s_drv_cb.RREADY);
         vif.s_drv_cb.RVALID <= 0;
     end
 endtask: send_read_data
