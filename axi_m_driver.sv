@@ -126,12 +126,13 @@ task axi_m_driver::send_write_data();
         @(vif.m_drv_cb);
         vif.m_drv_cb.WVALID <= 1;
 
-        // Wait for WREADY and deassert AWVALID
+        // Wait for WREADY and deassert WVALID
         #1;
         wait(vif.m_drv_cb.WREADY);
         vif.m_drv_cb.WVALID <= 0;
         vif.m_drv_cb.WLAST  <= 0;
     end
+    wait(vif.m_drv_cb.BVALID);
 endtask: send_write_data
 
 

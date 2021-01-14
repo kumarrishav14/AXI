@@ -9,10 +9,7 @@ class axi_s_driver extends uvm_driver;
     bit [7:0] mem [bit[A_WIDTH-1:0]];
     bit [A_WIDTH-1:0] w_addr, r_addr;
     bit w_done, r_done;
-    int addr_1, addr_n, addr_align;
-    int lower_byte_lane, upper_byte_lane, upper_wrap_boundary, lower_wrap_boundary;
-    int no_bytes, total_bytes;
-    bit isAligned;
+    
 
     // Methods
     extern task drive();
@@ -44,7 +41,7 @@ task axi_s_driver::run_phase(uvm_phase phase);
     vif.s_drv_cb.AWREADY    <= 1;
     vif.s_drv_cb.ARREADY    <= 1;
     vif.s_drv_cb.WREADY     <= 1;
-    vif.s_drv_cb.BVALID     <= 1;
+    // vif.s_drv_cb.BVALID     <= 1;
     // vif.s_drv_cb.RLAST      <= 1;
     vif.s_drv_cb.RVALID     <= 1;
     vif.s_drv_cb.RDATA      <= 'b0;
@@ -94,25 +91,38 @@ task axi_s_driver::read_write_address();
     s_wtrans.print();
 endtask: read_write_address
 
-// ISSUES::
-// 1. Implement for WARP
 task axi_s_driver::read_write_data();
+    int addr_1, addr_n, addr_align;
+    int lower_byte_lane, upper_byte_lane, upper_wrap_boundary, lower_wrap_boundary;
+    int no_bytes, total_bytes;
+    bit isAligned;
     int c;
+    bit err, align_err;
     `uvm_info("DEBUG_S", "Inside read_write_data", UVM_HIGH)
+    vif.s_drv_cb.BVALID     <= 0;
+    
+    // Initial values and calculations
     addr_1 = s_wtrans.addr;
     no_bytes = 2**s_wtrans.b_size;
     total_bytes = no_bytes * (s_wtrans.b_len+1);
-    // Calculate align address
     addr_align = int'(addr_1/no_bytes)*no_bytes;
     `uvm_info("DEBUG_S", $sformatf("Calculated aligned addr %0d", addr_align), UVM_HIGH)
     isAligned = addr_1 == addr_align;
+
+    // Calculate boundaries for WRAP Burst
     if(s_wtrans.b_type == WRAP) begin
         lower_wrap_boundary = int'(addr_1/total_bytes)*total_bytes;
         upper_wrap_boundary = lower_wrap_boundary + total_bytes;
         `uvm_info("DEBUG_S", $sformatf("Calculated Lower Wrap Boundary: %0d", lower_wrap_boundary), UVM_HIGH)
         `uvm_info("DEBUG_S", $sformatf("Calculated Upper Wrap Boundary: %0d", upper_wrap_boundary), UVM_HIGH)
     end
+
+    // check whether the wrap burst is alligned or not
+    if(s_wtrans.b_type == WRAP && !isAligned)
+        align_err = 1;
+
     // Store data
+    err = 0;
     for (int i=0; i<s_wtrans.b_len+1; i++) begin
         `uvm_info("DEBUG_S", "Inside read_data_loop", UVM_HIGH)
         // addr_n = addr_align + i*no_bytes;
@@ -148,7 +158,12 @@ task axi_s_driver::read_write_data();
         `uvm_info("DEBUG_S", $sformatf("addr_n is %0d", addr_n), UVM_HIGH)
         wait(vif.s_drv_cb.WVALID);
         // Follows little endian
+        err = 0;
         for (int j=lower_byte_lane; j<=upper_byte_lane; j++) begin
+            if(addr_n+j-lower_byte_lane >= 2**A_WIDTH)
+                err = 1;
+            if(err || align_err)
+                continue;
             mem[addr_n+j-lower_byte_lane] = vif.s_drv_cb.WDATA[8*c+:8];
             `uvm_info("DEBUG_S", $sformatf("c is %0d, addr is %0d, stored value is %h", c, addr_n+j-lower_byte_lane, mem[addr_n+j-lower_byte_lane]), UVM_HIGH)
             c++;
@@ -172,6 +187,15 @@ task axi_s_driver::read_write_data();
         end
         @(vif.s_drv_cb);
     end
+    vif.s_drv_cb.BID        <= s_wtrans.id;
+    if(err || align_err)
+        vif.s_drv_cb.BRESP  <= 2'b01;
+    else
+        vif.s_drv_cb.BRESP  <= 2'b00;
+    @(vif.s_drv_cb);
+    vif.s_drv_cb.BVALID <= 1;
+    @(vif.s_drv_cb);
+    vif.s_drv_cb.BVALID <= 0;
 endtask: read_write_data
 
 task axi_s_driver::read_read_address();
@@ -187,6 +211,10 @@ task axi_s_driver::read_read_address();
 endtask: read_read_address
 
 task axi_s_driver::send_read_data();
+    int addr_1, addr_n, addr_align;
+    int lower_byte_lane, upper_byte_lane, upper_wrap_boundary, lower_wrap_boundary;
+    int no_bytes, total_bytes;
+    bit isAligned;
     int c;
     bit err;
     `uvm_info("DEBUG_S", "Inside send_write_data", UVM_HIGH)
