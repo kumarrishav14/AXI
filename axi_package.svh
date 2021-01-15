@@ -10,3 +10,6 @@ import uvm_pkg::*;
 `include "axi_s_driver.sv"
 `include "axi_s_monitor.sv"
 `include "axi_slave.sv"
+`include "axi_scoreboard.sv"
+`include "axi_env.sv"
+`include "axi_base_test.sv"

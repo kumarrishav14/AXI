@@ -4,6 +4,7 @@ class axi_slave extends uvm_agent;
     // Components
     axi_s_driver drv;
     axi_s_monitor mon;
+    uvm_analysis_port#(axi_transaction#(D_WIDTH, A_WIDTH)) ap;
 
     // Variables
     env_config env_cfg;
@@ -31,10 +32,12 @@ function void axi_slave::build_phase(uvm_phase phase);
     
     drv.vif = env_cfg.intf;
     mon.vif = env_cfg.intf;
+
+    ap = new("ap", this);
 endfunction: build_phase
 
 function void axi_slave::connect_phase(uvm_phase phase);
     super.connect_phase(phase);
-
+    mon.ap.connect(ap);
 endfunction: connect_phase
 
