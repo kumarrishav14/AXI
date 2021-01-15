@@ -6,6 +6,7 @@ class axi_master extends uvm_agent;
     uvm_sequencer#(axi_transaction#(D_WIDTH, A_WIDTH)) r_seqr;
     axi_m_driver drv;
     axi_m_monitor mon;
+    uvm_analysis_port#(axi_transaction#(D_WIDTH, A_WIDTH)) ap;
 
     // Variables
     env_config env_cfg;
@@ -35,6 +36,8 @@ function void axi_master::build_phase(uvm_phase phase);
     
     drv.vif = env_cfg.intf;
     mon.vif = env_cfg.intf;
+
+    ap = new("ap", this);
 endfunction: build_phase
 
 function void axi_master::connect_phase(uvm_phase phase);
@@ -42,5 +45,6 @@ function void axi_master::connect_phase(uvm_phase phase);
 
     drv.seq_item_port.connect(w_seqr.seq_item_export);
     drv.seq_item_port2.connect(r_seqr.seq_item_export);
+    mon.ap.connect(ap);
 endfunction: connect_phase
 
