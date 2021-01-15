@@ -12,3 +12,4 @@ import uvm_pkg::*;
 `include "axi_slave.sv"
 `include "axi_scoreboard.sv"
 `include "axi_env.sv"
+`include "axi_base_test.sv"
