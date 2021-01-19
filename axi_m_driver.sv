@@ -57,6 +57,7 @@ task axi_m_driver::drive();
             if(w_done) begin
                 w_done = 0;
                 seq_item_port.get_next_item(w_trans);
+                `uvm_info(get_name(), "Write Packet received in master driver", UVM_LOW)
                 w_trans.print();
                 fork
                     send_write_address();
@@ -71,6 +72,8 @@ task axi_m_driver::drive();
             if(r_done) begin
                 r_done = 0;
                 seq_item_port2.get_next_item(r_trans);
+                `uvm_info(get_name(), "Read Packet received in master driver", UVM_LOW)
+                r_trans.print();
                 send_read_address();
                 seq_item_port2.item_done();
                 r_done = 1;
@@ -159,5 +162,3 @@ task axi_m_driver::send_read_address();
     // Wait for RLAST signal before sending next address
     wait(vif.m_drv_cb.RLAST && vif.m_drv_cb.RVALID);
 endtask: send_read_address
-
-
