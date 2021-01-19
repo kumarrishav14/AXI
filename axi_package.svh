@@ -1,9 +1,9 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
+`include "axi_config_objs.svh"
 `include "axi_transaction.sv"
 `include "axi_write_seq.sv"
 `include "axi_read_seq.sv"
-`include "axi_config_objs.svh"
 `include "axi_m_driver.sv"
 `include "axi_m_monitor.sv"
 `include "axi_master.sv"
@@ -12,4 +12,4 @@ import uvm_pkg::*;
 `include "axi_slave.sv"
 `include "axi_scoreboard.sv"
 `include "axi_env.sv"
-`include "axi_base_test.sv"
+`include "axi_test.sv"

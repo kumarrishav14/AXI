@@ -32,13 +32,6 @@ class axi_transaction#(d_width = 16, a_width = 16) extends uvm_sequence_item;
         foreach (data[i] )
             data[i].size() == 2**b_size;
     }
-
-    // constraint b_type_val {
-    //     /*  solve order constraints  */
-    
-    //     /*  rand variable constraints  */
-    //     b_type == WRAP;
-    // }
     
 
     constraint b_len_val {
@@ -61,8 +54,22 @@ class axi_transaction#(d_width = 16, a_width = 16) extends uvm_sequence_item;
         if(b_type == WRAP)
             addr == int'(addr/2**b_size) * 2**b_size;
     }
-    
-    //  Group: Functions
+
+    constraint addr_val_align {
+        /*  solve order constraints  */
+        solve b_size before addr;
+
+        /*  rand variable constraints  */
+        addr == int'(addr/2**b_size) * 2**b_size;
+    }
+
+    constraint addr_val_unalign {
+        /*  solve order constraints  */
+        solve b_size before addr;
+
+        /*  rand variable constraints  */
+        addr != int'(addr/2**b_size) * 2**b_size;
+    }
 
     //  Constructor: new
     function new(string name = "axi_transaction");
@@ -85,14 +92,6 @@ class axi_transaction#(d_width = 16, a_width = 16) extends uvm_sequence_item;
     // extern function void do_unpack();
     
 endclass: axi_transaction
-
-
-/*----------------------------------------------------------------------------*/
-/*  Constraints                                                               */
-/*----------------------------------------------------------------------------*/
-
-
-
 
 /*----------------------------------------------------------------------------*/
 /*  Functions                                                                 */
@@ -182,9 +181,3 @@ function bit axi_transaction::do_compare(uvm_object rhs, uvm_comparer comparer);
         do_compare &= this.r_resp[i] == rhs_.r_resp[i];
     end
 endfunction: do_compare
-
-
-
-
-
-
