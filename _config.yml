@@ -1,1 +1,6 @@
 theme: jekyll-theme-cayman
+title: AMBA AXI
+description: Basic VIP for AMBA AXI Protocol
+# show_downloads: f
+
+markdown: kramdown
