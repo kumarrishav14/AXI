@@ -1,0 +1,5 @@
+*.mti
+work/**
+*.mpf
+*.wlf
+wave.do
